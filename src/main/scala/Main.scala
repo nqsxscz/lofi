@@ -105,7 +105,8 @@ object Main {
 
       // asian
       val asian_origin = 0.0
-      val o19 = exp(-r * (T - now)) * expectation((average(S)(asian_origin) - K) ^ 0)(T)
+      //val o19 = exp(-r * (T - now)) * expectation((average(S)(asian_origin) - K) ^ 0)(T)
+      val o19 = cdiscount(r)(T) * expectation((average(S)(asian_origin) - K) ^ 0)(T)
 
       // next we need to change Cond(b, l, r) to Cond(b, o)
 
