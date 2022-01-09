@@ -72,7 +72,7 @@ case class Model(a: Observable[Real], b: Observable[Real], origin: Time, init: R
 sealed trait DiscountingType
 case object Continuous extends DiscountingType
 
-case class DiscountFactor(r: Real, maturity: Time, dType: DiscountType) extends Observable[Real]
+case class DiscountFactor(r: Real, maturity: Time, dType: DiscountingType) extends Observable[Real]
 
 
 object Observable {
