@@ -78,8 +78,8 @@ object Main {
       val S = o2
       //val S = exp(o2)
       //val o13 = expectation(o2)(T)
-      val o13 = exp(-r * (T - now)) * expectation((S - K) ^ 0)(T)
-      val o13_put = exp(-r * (T - now)) * expectation((K - S) ^ 0)(T)
+      val o13 = cdiscount(r)(T) * expectation((S - K) ^ 0)(T)
+      val o13_put = cdiscount(r)(T) * expectation((K - S) ^ 0)(T)
       val pcp = (o13 - o13_put) - (S - exp(-r * (T - now))*K) // should be near 0
 
       val L = 95.0
@@ -88,12 +88,12 @@ object Main {
       // ui
       val o14 = exp(-r * (T - now)) * expectation(cond(ever(S > H))((S - K) ^ 0)(0))(T)
       // di
-      val o15 = exp(-r * (T - now)) * expectation(cond(ever(S <= H))((S - K) ^ 0)(0))(T)
+      val o15 = cdiscount(r)(T) * expectation(cond(ever(S <= H))((S - K) ^ 0)(0))(T)
       // uo
-      val o16 = exp(-r * (T - now)) * expectation(cond(always(S <= H))((S - K) ^ 0)(0))(T)
+      val o16 = cdiscount(r)(T) * expectation(cond(always(S <= H))((S - K) ^ 0)(0))(T)
       // do
       val E_S = expectation(S)(T)
-      val o17 = exp(-r * (T - now)) * expectation(cond(always(S > H))((S - K) ^ 0)(0))(T)
+      val o17 = cdiscount(r)(T) * expectation(cond(always(S > H))((S - K) ^ 0)(0))(T)
       //val o17 = exp(-r * (T - now)) * expectation(cond(always(S > H))((S - K) ^ 0)(0))(T)
 
       val bp1 = o14 + o16 - o13 // ui + uo = stc_call
@@ -101,7 +101,7 @@ object Main {
 
       // lookback
       val lookback_origin = 0.0
-      val o18 = exp(-r * (T - now)) * expectation((max(S)(lookback_origin)-S) ^ 0)(T)
+      val o18 = cdiscount(r)(T) * expectation((max(S)(lookback_origin)-S) ^ 0)(T)
 
       // asian
       val asian_origin = 0.0
