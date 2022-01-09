@@ -460,7 +460,7 @@ object Observable {
     case Worst(os, n) =>
       ???
     case Expectation(o, s) =>
-      s"\\mathbb{E}(${toTex(o)(s"(T=$s)")} | \\mathcal{F}_{$time})"
+      s"\\mathbb{E}(${toTex(o)("T")} | \\mathcal{F}_{$time})"
     case Model(a, b, origin, init, id, Log) =>
       s"\\tilde{S_{$time}^{$id}}"
     case _ => s"{Unknown}"
