@@ -413,7 +413,7 @@ object Observable {
       val shouldEnclose_r = shouldEnclose(r)
       val lRepr = if shouldEnclose_l then s"($lTex)" else lTex
       val rRepr = if shouldEnclose_r then s"($rTex)" else rTex
-      if !shouldEnclose_l && !shouldEnclose_r then s"$lRepr*$rRepr" else s"$lRepr$rRepr"
+      if !shouldEnclose_l && !shouldEnclose_r then s"$lRepr$rRepr" else s"$lRepr$rRepr"
     case Lift2R(l, r, Div) =>
       val lTex = toTex(l)(time)
       val rTex = toTex(r)(time)
