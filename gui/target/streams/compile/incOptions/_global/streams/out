@@ -1,0 +1,59 @@
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/haddane_y/IdeaProjects/lofi/gui/target/scala-3.1.0/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$5.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$3.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$6.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$7.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$4.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$5.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$3.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$2.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$6.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$1.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$7.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$4.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$5.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$3.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$6.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$7.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$4.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$5.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$3.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$2.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$6.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$1.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$7.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$4.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0mRegistering generated classes:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$5.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$3.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$6.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$7.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$4.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$5.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$3.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$2.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$6.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$1.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$7.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ComboBoxes$$anon$4.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /home/haddane_y/IdeaProjects/lofi/gui/target/scala-3.1.0/classes.bak[0m

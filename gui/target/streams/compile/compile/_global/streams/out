@@ -1,0 +1,17 @@
+[0m[[0m[31merror[0m] [0m[0m[31m-- [E007] Type Mismatch Error: /home/haddane_y/IdeaProjects/lofi/gui/src/main/scala/ComboBoxes.scala:38:86 [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m38 |[0m  [33mvar[0m [36mobservablesR[0m: [35mscala.collection.mutable.Map[String, Observable[Real]][0m = Map.empty[[35mString[0m, [35mObservable[Real][0m][0m
+[0m[[0m[31merror[0m] [0m[0m   |                                                                             [31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m   |Found:    Map[String, lofi.Observable[lofi.Types.Real]][0m
+[0m[[0m[31merror[0m] [0m[0m   |Required: [1m[32mcollection[0m[1m[32m.[0m[1m[32mmutable[0m[1m[32m.[0mMap[String, lofi.Observable[lofi.Types.Real]][0m
+[0m[[0m[31merror[0m] [0m[0m[31m-- [E007] Type Mismatch Error: /home/haddane_y/IdeaProjects/lofi/gui/src/main/scala/ComboBoxes.scala:39:80 [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m39 |[0m  [33mvar[0m [36mobservablesT[0m: [35mscala.collection.mutable.Map[String, Observable[Time]][0m = Map([31m"Time"[0m -> now)[0m
+[0m[[0m[31merror[0m] [0m[0m   |                                                                             [31m^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m   |Found:    Map[String, lofi.Observable[lofi.Types.Time]][0m
+[0m[[0m[31merror[0m] [0m[0m   |Required: [1m[32mcollection[0m[1m[32m.[0m[1m[32mmutable[0m[1m[32m.[0mMap[String, lofi.Observable[lofi.Types.Time]][0m
+[0m[[0m[31merror[0m] [0m[0m[31m-- [E007] Type Mismatch Error: /home/haddane_y/IdeaProjects/lofi/gui/src/main/scala/ComboBoxes.scala:40:89 [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m40 |[0m  [33mvar[0m [36mobservablesB[0m: [35mscala.collection.mutable.Map[String, Observable[Boolean]][0m = Map.empty[[35mString[0m, [35mObservable[Boolean][0m][0m
+[0m[[0m[31merror[0m] [0m[0m   |                                                                                [31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m   |      Found:    Map[String, lofi.Observable[Boolean]][0m
+[0m[[0m[31merror[0m] [0m[0m   |      Required: [1m[32mcollection[0m[1m[32m.[0m[1m[32mmutable[0m[1m[32m.[0mMap[String, lofi.Observable[Boolean]][0m
+[0m[[0m[31merror[0m] [0m[0mthree errors found[0m
+[0m[[0m[31merror[0m] [0m[0mthree errors found[0m
