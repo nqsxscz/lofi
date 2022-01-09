@@ -407,9 +407,11 @@ object Observable {
     case Lift2R(l, r, Mul) =>
       val lTex = toTex(l)(time)
       val rTex = toTex(r)(time)
-      val lRepr = if shouldEnclose(l) then s"($lTex)" else lTex
-      val rRepr = if shouldEnclose(r) then s"($rTex)" else rTex
-      s"$lRepr*$rRepr"
+      val shouldEnclose_l = shouldEnclose(l)
+      val shouldEnclose_r = shouldEnclose(r)
+      val lRepr = if shouldEnclose_l then s"($lTex)" else lTex
+      val rRepr = if shouldEnclose_r then s"($rTex)" else rTex
+      if !shouldEnclose_l and !shouldEnclose_r then s"$lRepr*$rRepr" else s"$lRepr$rRepr"
     case Lift2R(l, r, Div) =>
       val lTex = toTex(l)(time)
       val rTex = toTex(r)(time)
@@ -432,8 +434,8 @@ object Observable {
     case ReduceR(o, origin, z, Add) => val s = "s"; s"\\sum_{t_0 := $origin}^{$time}{${toTex(o)(s)}}"
     case ReduceR(o, origin, z, Mul) => val s = "s"; s"\\prod_{t_0 := $origin}^{$time}{${toTex(o)(s)}}"
     case ReduceR(o, origin, z, Max) => val s = "s"; s"\\max_{t_0 := $origin \\leq s \\leq $time}{${toTex(o)(s)}}"
-    case ReduceR(o, 0.0, z, Avg) => val s = "s"; s"\\frac{1}{$time}int_{0}^{$time}{${toTex(o)(s)} ds}"
-    case ReduceR(o, origin, z, Avg) => val s = "s"; s"\\frac{1}{($time - t_0)}\\int_{t_0 := $origin}^{$time}{${toTex(o)(s)} ds}"
+    case ReduceR(o, 0.0, z, Avg) => val s = "s"; s"\\frac{1}{$time}\\int_{0}^{$time}{${toTex(o)(s)} ds}"
+    case ReduceR(o, origin, z, Avg) => val s = "s"; s"\\frac{1}{($time - t_0)}\\int_{t_0}^{$time}{${toTex(o)(s)} ds}"
     case Comp2R(l, r, Leq) => s"${toTex(l)(time)} <= ${toTex(r)(time)}"
     case Comp2R(l, r, Geq) => s"${toTex(l)(time)} >= ${toTex(r)(time)}"
     case Comp2R(l, r, Lt)  => s"${toTex(l)(time)} <  ${toTex(r)(time)}"
@@ -470,7 +472,8 @@ object Observable {
       s"\\mathbb{E}(${toTex(o)("T")} | \\mathcal{F}_{$time})"
     case Model(a, b, origin, init, id, Log) =>
       s"\\tilde{S_{$time}^{$id}}"
-    case DiscountFactor(r, maturity, Continuous) => ???
+    case DiscountFactor(r, maturity, Continuous) =>
+      s"e^{-r*(T-$time)}"
     case _ => s"{Unknown}"
   }
 }
