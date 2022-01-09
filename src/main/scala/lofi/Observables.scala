@@ -185,7 +185,7 @@ object Observable {
     case Worst(os, n) => os.map(o => evaluate(evaluationContext)(simulationContext)(o)(t)).sorted.apply(n)
     case Expectation(o, s) => evaluateExpectation(evaluationContext)(simulationContext)(o)(s)(t)
     case Model(a, b, origin, init, id, f) => ???
-    case DiscountFactor(r, T, Continuous) => evaluate(evaluationContext)(simulationContext)(exp(-r * (T - now)))(t)
+    case DiscountFactor(r, maturity, Continuous) => evaluate(evaluationContext)(simulationContext)(exp(-r * (maturity - now)))(t)
     case _ => ???
   }
 
