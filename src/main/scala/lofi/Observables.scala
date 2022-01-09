@@ -465,7 +465,7 @@ object Observable {
     case Cond(b, l, r) =>
       val lTex = toTex(l)(time)
       val lRepr = if shouldEnclose(l) then s"($lTex)" else lTex
-      s"$lRepr \\chi_{${toTex(b)(time)}}"
+      s"$lRepr \\chi_{{${toTex(b)(time)}}}"
     case Freeze(o, s) =>
       ???
     case Worst(os, n) =>
