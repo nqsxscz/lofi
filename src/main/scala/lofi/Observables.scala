@@ -69,6 +69,11 @@ case class Expectation(o: Observable[Real], t: Time) extends Observable[Real]
 
 case class Model(a: Observable[Real], b: Observable[Real], origin: Time, init: Real, id: String, f: UnROp) extends Observable[Real]
 
+sealed trait DiscountingType
+case object Continuous extends DiscountingType
+
+case class DiscountFactor(r: Real, maturity: Time, dType: DiscountType) extends Observable[Real]
+
 
 object Observable {
 
@@ -99,6 +104,8 @@ object Observable {
   def performance(o: Observable[Real])(origin: Time): Observable[Real] = (o / freeze(o)(origin :: Nil)) - 1.0
 
   def expectation(o: Observable[Real])(t: Time): Observable[Real] = Expectation(o, t)
+  
+  def cdiscount(r: Real)(maturity: Time): Observable[Real] = DiscountFactor(r, maturity, Continuous)
 
   def pp[A](input: Observable[A]): String = input match {
     case Now => "t"
@@ -463,6 +470,7 @@ object Observable {
       s"\\mathbb{E}(${toTex(o)("T")} | \\mathcal{F}_{$time})"
     case Model(a, b, origin, init, id, Log) =>
       s"\\tilde{S_{$time}^{$id}}"
+    case DiscountFactor(r, maturity, Continuous) => ???
     case _ => s"{Unknown}"
   }
 }
