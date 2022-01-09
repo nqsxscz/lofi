@@ -388,6 +388,7 @@ object Observable {
     case ReduceR(o, origin, z, Avg) => true
     // ...
     case Expectation(_, _) => false
+    case DiscountFactor(_, _, _) => false
     case _ => true
   }
 
@@ -474,7 +475,7 @@ object Observable {
     case Model(a, b, origin, init, id, Log) =>
       s"\\tilde{S_{$time}^{$id}}"
     case DiscountFactor(r, maturity, Continuous) =>
-      s"e^{-r*(T-$time)}"
+      s"e^{-r(T-$time)}"
     case _ => s"{Unknown}"
   }
 }
