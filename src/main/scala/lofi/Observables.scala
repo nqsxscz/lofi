@@ -426,7 +426,7 @@ object Observable {
     case ReduceR(o, origin, z, Mul) => val s = "s"; s"\\prod_{t_0 := $origin}^{$time}{${toTex(o)(s)}}"
     case ReduceR(o, origin, z, Max) => val s = "s"; s"\\max_{t_0 := $origin \\leq s \\leq $time}{${toTex(o)(s)}}"
     case ReduceR(o, 0.0, z, Avg) => val s = "s"; s"\\frac{1}{$time}int_{0}^{$time}{${toTex(o)(s)} ds}"
-    case ReduceR(o, origin, z, Avg) => val s = "s"; s"\\frac{1}{($time - t_0)}int_{t_0 := $origin}^{$time}{${toTex(o)(s)} ds}"
+    case ReduceR(o, origin, z, Avg) => val s = "s"; s"\\frac{1}{($time - t_0)}\\int_{t_0 := $origin}^{$time}{${toTex(o)(s)} ds}"
     case Comp2R(l, r, Leq) => s"${toTex(l)(time)} <= ${toTex(r)(time)}"
     case Comp2R(l, r, Geq) => s"${toTex(l)(time)} >= ${toTex(r)(time)}"
     case Comp2R(l, r, Lt)  => s"${toTex(l)(time)} <  ${toTex(r)(time)}"
