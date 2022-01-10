@@ -37,7 +37,7 @@ object Main {
 
     def main(args: Array[String]): Unit = {
       val data = Map("AAPL" -> SortedMap(0.0 -> 100.0, 1.0 -> 98.76, 2.0 -> 93.52, 3.0 -> 101.78))/*.map((k, v) => (k, scala.math.log(v))))*/
-      val symbols = Map("r" -> 0.05, "vol" -> 0.2, "T" -> 5.0, "K" -> 100.0, "B" -> 120.0)
+      val symbols = Map("r" -> 0.05, "vol" -> 0.2, "T" -> 5.0, "T_1" -> 4.0, "T_2" -> 4.0,"t_0" -> 0.0, "K" -> 100.0, "L" -> 95.0, "H" -> 105.0)
       val evaluationContext = EvaluationContext(data, symbols)
       val ts = evaluationContext.times
       println(s"ts=$ts")
@@ -54,8 +54,8 @@ object Main {
       val rand = new scala.util.Random(0)
       val brownian_data = Map("AAPL" -> ts.map(t => (t, (1 to pathCount).toList.map(_ => generateBrownianPath(t)(simulation_times)(rand)))).toMap)
       //println(s"brownian_data=$brownian_data")
-      val r = 0.05
-      val vol = 0.2
+      val r = symbol("r")
+      val vol = symbol("vol")
       val models = Map("AAPL" -> ((origin: Time, init: Real) => Model(r-0.5*vol*vol, vol, origin, init, "AAPL", Log)))
       val simulationContext = SimulationContext(brownian_data, models, simulation_times, pathCount)
 
@@ -74,32 +74,39 @@ object Main {
       val o12 = cond(now <= ts(1))(now)(o11)
       */
 
+      /*
       val symr = symbol("r")
       val symK = symbol("K")
       val symT = symbol("T")
+      val symT1 = symbol("T_1")
+      val symT2 = symbol("T_2")
+      val symt0 = symbol("t_0")
       val symB = symbol("B")
-
-      val T = 5.0
-      val K = 100.0
+       */
+      val T = symbol("T")
+      val T1 = symbol("T_1")
+      val T2 = symbol("T_2")
+      val t0 = symbol("t_0")
+      val K = symbol("K")
       val S = o2
       //val S = exp(o2)
       //val o13 = expectation(o2)(T)
-      val o13 = cdiscount(symr)(symT) * expectationT((S - symK) ^ 0)(symT)
-      val o13_put = cdiscount(r)(T) * expectation((K - S) ^ 0)(T)
+      val o13 = cdiscount(r)(T) * expectationT((S - K) ^ 0)(T)
+      val o13_put = cdiscount(r)(T) * expectationT((K - S) ^ 0)(T)
       val pcp = (o13 - o13_put) - (S - exp(-r * (T - now))*K) // should be near 0
 
-      val L = 95.0
-      val H = 105.0
+      val L = symbol("L")
+      val H = symbol("H")
 
       // ui
-      val o14 = exp(-r * (T - now)) * expectation(cond(ever(S > H))((S - K) ^ 0)(0))(T)
+      val o14 = exp(-r * (T - now)) * expectationT(cond(ever(S > H))((S - K) ^ 0)(0))(T)
       // di
-      val o15 = cdiscount(r)(T) * expectation(cond(ever(S <= H))((S - K) ^ 0)(0))(T)
+      val o15 = cdiscount(r)(T) * expectationT(cond(ever(S <= H))((S - K) ^ 0)(0))(T)
       // uo
-      val o16 = cdiscount(r)(T) * expectation(cond(always(S <= H))((S - K) ^ 0)(0))(T)
+      val o16 = cdiscount(r)(T) * expectationT(cond(always(S <= H))((S - K) ^ 0)(0))(T)
       // do
-      val E_S = expectation(S)(T)
-      val o17 = cdiscount(r)(T) * expectation(cond(always(S > H))((S - K) ^ 0)(0))(T)
+      val E_S = expectationT(S)(T)
+      val o17 = cdiscount(r)(T) * expectationT(cond(always(S > H))((S - K) ^ 0)(0))(T)
       //val o17 = exp(-r * (T - now)) * expectation(cond(always(S > H))((S - K) ^ 0)(0))(T)
 
       val bp1 = o14 + o16 - o13 // ui + uo = stc_call
@@ -107,12 +114,14 @@ object Main {
 
       // lookback
       val lookback_origin = 0.0
-      val o18 = cdiscount(r)(T) * expectation((max(S)(lookback_origin)-S) ^ 0)(T)
+      val o18 = cdiscount(r)(T) * (expectationT((maxT(S)(t0)-S) ^ 0)(T1) + expectationT((maxT(S)(t0)-S) ^ 0)(T2))
 
       // asian
       val asian_origin = 0.0
       //val o19 = exp(-r * (T - now)) * expectation((average(S)(asian_origin) - K) ^ 0)(T)
-      val o19 = cdiscount(symr)(symT) * expectationT((average(S)(asian_origin) - symK) ^ 0)(symT)
+      //val o19 = cdiscount(symr)(symT) * expectationT((average(S)(asian_origin) - symK) ^ 0)(symT)
+      val o19 = cdiscount(r)(T) * expectationT((averageT(S)(t0) - K) ^ 0)(T)
+
 
       // next we need to change Cond(b, l, r) to Cond(b, o)
 
@@ -179,8 +188,8 @@ object Main {
       testObs(evaluationContext)(simulationContext)(o13)
       //val prices = ts.map(t => (t, data("AAPL")(t) + (r - 0.5*vol*vol)*(T-t) )).toMap
       //val prices = ts.map(t => (t, scala.math.exp(data("AAPL")(t)) * scala.math.exp(r * (T-t)) )).toMap
-      val prices = ts.map(t => (t, bs(r)(vol)(scala.math.exp(data("AAPL")(t)))(K)(t)(T))).toMap
-      println(s"prices=$prices")
+      //val prices = ts.map(t => (t, bs(r)(vol)(scala.math.exp(data("AAPL")(t)))(K)(t)(T))).toMap
+      //println(s"prices=$prices")
       println("(Put Call Parity)")
       testObs(evaluationContext)(simulationContext)(pcp)
 

@@ -55,6 +55,8 @@ case class Lift2R(l: Observable[Real], r: Observable[Real], op: BinROp) extends 
 
 case class ReduceR(o: Observable[Real], origin: Time, z: Real, op: BinROp) extends Observable[Real]
 
+case class ReduceRT(o: Observable[Real], origin: Observable[Time], z: Real, op: BinROp) extends Observable[Real]
+
 case class Comp2R(l: Observable[Real], r: Observable[Real], op: CompROp) extends Observable[Boolean]
 
 case class Lift1B(o: Observable[Boolean], op: UnBOp) extends Observable[Boolean]
@@ -105,7 +107,11 @@ object Observable {
 
   def average(o: Observable[Real])(origin: Time): Observable[Real] = ReduceR(o, origin, 0.0, Avg)
 
+  def averageT(o: Observable[Real])(origin: Observable[Time]): Observable[Real] = ReduceRT(o, origin, 0.0, Avg)
+
   def max(o: Observable[Real])(origin: Time): Observable[Real] = ReduceR(o, origin, Double.MinValue, Max)
+
+  def maxT(o: Observable[Real])(origin: Observable[Time]): Observable[Real] = ReduceRT(o, origin, Double.MinValue, Max)
 
   def performance(o: Observable[Real])(origin: Time): Observable[Real] = (o / freeze(o)(origin :: Nil)) - 1.0
 
@@ -173,6 +179,9 @@ object Observable {
     case ReduceR(o, origin, z, Mul) => evaluateReduceR(evaluationContext)(simulationContext)(o)(origin)(z)(_*_)(t)
     case ReduceR(o, origin, z, Max) => evaluateReduceR(evaluationContext)(simulationContext)(o)(origin)(z)(scala.math.max)(t)
     case ReduceR(o, origin, z, Avg) => evaluateReduceR(evaluationContext)(simulationContext)(o)(origin)(z)(_+_)(t) / evaluationContext.times.count(s => origin <= s && s <= t).toDouble
+    case ReduceRT(o, o_origin, z, op) =>
+      val origin = evaluate(evaluationContext)(simulationContext)(o_origin)(t)
+      evaluate(evaluationContext)(simulationContext)(ReduceR(o, origin, z, op))(t)
     case Comp2R(l, r, Leq) => evaluate(evaluationContext)(simulationContext)(l)(t) <= evaluate(evaluationContext)(simulationContext)(r)(t)
     case Comp2R(l, r, Geq) => evaluate(evaluationContext)(simulationContext)(l)(t) >= evaluate(evaluationContext)(simulationContext)(r)(t)
     case Comp2R(l, r, Lt)  => evaluate(evaluationContext)(simulationContext)(l)(t) <  evaluate(evaluationContext)(simulationContext)(r)(t)
@@ -282,6 +291,9 @@ object Observable {
       val sim_o_2 = sim_o_1.map(path => times.zip(path).toMap)
       val sim_o = (1 to simulationContext.pathCount).toList.zip(sim_o_2).toMap
       (1 to simulationContext.pathCount).toList.map(i => times.map(t => times.filter(origin <= _).filter(_ <= t).map(s => sim_o(i)(s)).foldLeft(z)(_ + _) / times.count(s => origin <= s && s <= t).toDouble))
+    case ReduceRT(o, o_origin, z, op) =>
+      val origin = evaluate(evaluationContext)(simulationContext)(o_origin)(evaluationContext.times.max)
+      simulate(evaluationContext)(simulationContext)(ReduceR(o, origin, z, op))
     case Comp2R(l, r, Leq) => simulateLift2(evaluationContext)(simulationContext)(l)(r)(_ <= _)
     case Comp2R(l, r, Geq) => simulateLift2(evaluationContext)(simulationContext)(l)(r)(_ >= _)
     case Comp2R(l, r, Lt)  => simulateLift2(evaluationContext)(simulationContext)(l)(r)(_ <  _)
@@ -400,10 +412,8 @@ object Observable {
     case Lift2R(_, _, Sub) => true
     case Lift2R(_, _, Mul) => false
     case Lift2R(_, _, Div) => true
-    case ReduceR(_, _, _, Add) => true
-    case ReduceR(o, origin, z, Mul) => true
-    case ReduceR(o, origin, z, Max) => true
-    case ReduceR(o, origin, z, Avg) => true
+    case ReduceR(_, _, _, _) => true
+    case ReduceRT(_, _, _, _) => true
     // ...
     case Expectation(_, _) => false
     case DiscountFactor(_, _, _) => false
@@ -452,11 +462,31 @@ object Observable {
       val lTex = toTex(l)(time)
       val lRepr = if shouldEnclose(l) then s"($lTex)" else lTex
       s"$lRepr^{${toTex(r)(time)}}"
-    case ReduceR(o, origin, z, Add) => val s = "s"; s"\\sum_{t_0 := $origin}^{$time}{${toTex(o)(s)}}"
-    case ReduceR(o, origin, z, Mul) => val s = "s"; s"\\prod_{t_0 := $origin}^{$time}{${toTex(o)(s)}}"
-    case ReduceR(o, origin, z, Max) => val s = "s"; s"\\max_{t_0 \\leq s \\leq $time}{${toTex(o)(s)}}"
-    case ReduceR(o, 0.0, z, Avg) => val s = "s"; s"\\frac{1}{$time}\\int_{0}^{$time}{${toTex(o)(s)} ds}"
-    case ReduceR(o, origin, z, Avg) => val s = "s"; s"\\frac{1}{($time - t_0)}\\int_{t_0}^{$time}{${toTex(o)(s)} ds}"
+    case ReduceR(o, origin, z, Add) =>
+      val u = "u"
+      s"\\sum_{t_0 := $origin}^{$time}{${toTex(o)(u)}}"
+    case ReduceR(o, origin, z, Mul) =>
+      val u = "u"
+      s"\\prod_{t_0 := $origin}^{$time}{${toTex(o)(u)}}"
+    case ReduceR(o, origin, z, Max) =>
+      val u = "u"
+      s"\\max_{t_0 \\leq $u \\leq $time}{${toTex(o)(u)}}"
+    case ReduceR(o, origin, z, Avg) =>
+      val u = "u"
+      s"\\frac{1}{($time - t_0)}\\int_{t_0 = $origin}^{$time}{${toTex(o)(u)} d$u}"
+    case ReduceRT(o, origin, z, Add) =>
+      val u = "u"
+      s"\\sum_{${toTex(origin)(time)}}^{$time}{${toTex(o)(u)}}"
+    case ReduceRT(o, origin, z, Mul) =>
+      val u = "u"
+      s"\\prod_{${toTex(origin)(time)}}^{$time}{${toTex(o)(u)}}"
+    case ReduceRT(o, origin, z, Max) =>
+      val u = "u"
+      s"\\max_{${toTex(origin)(time)} \\leq $u \\leq $time}{${toTex(o)(u)}}"
+    case ReduceRT(o, origin, z, Avg) =>
+      val u = "u"
+      val t_0 = toTex(origin)(time)
+      s"\\frac{1}{($time - $t_0)}\\int_{$t_0}^{$time}{${toTex(o)(u)} d$u}"
     case Comp2R(l, r, Leq) => s"${toTex(l)(time)} \\leq ${toTex(r)(time)}"
     case Comp2R(l, r, Geq) => s"${toTex(l)(time)} \\geq ${toTex(r)(time)}"
     case Comp2R(l, r, Lt)  => s"${toTex(l)(time)} <  ${toTex(r)(time)}"
