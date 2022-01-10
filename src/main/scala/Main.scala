@@ -37,7 +37,8 @@ object Main {
 
     def main(args: Array[String]): Unit = {
       val data = Map("AAPL" -> SortedMap(0.0 -> 100.0, 1.0 -> 98.76, 2.0 -> 93.52, 3.0 -> 101.78))/*.map((k, v) => (k, scala.math.log(v))))*/
-      val evaluationContext = EvaluationContext(data)
+      val symbols = Map("r" -> 0.05, "vol" -> 0.2, "T" -> 5.0, "K" -> 100.0, "B" -> 120.0)
+      val evaluationContext = EvaluationContext(data, symbols)
       val ts = evaluationContext.times
       println(s"ts=$ts")
       println(s"data=$data")
@@ -73,12 +74,17 @@ object Main {
       val o12 = cond(now <= ts(1))(now)(o11)
       */
 
+      val symr = symbol("r")
+      val symK = symbol("K")
+      val symT = symbol("T")
+      val symB = symbol("B")
+
       val T = 5.0
       val K = 100.0
       val S = o2
       //val S = exp(o2)
       //val o13 = expectation(o2)(T)
-      val o13 = cdiscount(r)(T) * expectation((S - K) ^ 0)(T)
+      val o13 = cdiscount(symr)(symT) * expectationT((S - symK) ^ 0)(symT)
       val o13_put = cdiscount(r)(T) * expectation((K - S) ^ 0)(T)
       val pcp = (o13 - o13_put) - (S - exp(-r * (T - now))*K) // should be near 0
 
@@ -106,7 +112,7 @@ object Main {
       // asian
       val asian_origin = 0.0
       //val o19 = exp(-r * (T - now)) * expectation((average(S)(asian_origin) - K) ^ 0)(T)
-      val o19 = cdiscount(r)(T) * expectation((average(S)(asian_origin) - K) ^ 0)(T)
+      val o19 = cdiscount(symr)(symT) * expectationT((average(S)(asian_origin) - symK) ^ 0)(symT)
 
       // next we need to change Cond(b, l, r) to Cond(b, o)
 

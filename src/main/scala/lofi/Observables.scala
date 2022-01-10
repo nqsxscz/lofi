@@ -45,6 +45,8 @@ case object Now extends Observable[Time]
 
 case class Const[A](a: A) extends Observable[A]
 
+case class Symbol(id: String) extends Observable[Real]
+
 case class Lookup(id: String) extends Observable[Real]
 
 case class Lift1R(o: Observable[Real], op: UnROp) extends Observable[Real]
@@ -67,12 +69,14 @@ case class Worst(os: List[Observable[Real]], n: Int) extends Observable[Real]
 
 case class Expectation(o: Observable[Real], t: Time) extends Observable[Real]
 
+case class ExpectationT(o: Observable[Real], t: Observable[Time]) extends Observable[Real]
+
 case class Model(a: Observable[Real], b: Observable[Real], origin: Time, init: Real, id: String, f: UnROp) extends Observable[Real]
 
 sealed trait DiscountingType
 case object Continuous extends DiscountingType
 
-case class DiscountFactor(r: Real, maturity: Time, dType: DiscountingType) extends Observable[Real]
+case class DiscountFactor(r: Observable[Real], maturity: Observable[Time], dType: DiscountingType) extends Observable[Real]
 
 
 object Observable {
@@ -84,6 +88,8 @@ object Observable {
   implicit def booleanToObservable(b: Boolean): Observable[Boolean] = Const(b)
 
   def exp(o: Observable[Real]): Observable[Real] = Lift1R(o, Exp)
+
+  def symbol(id: String): Observable[Real] = Symbol(id)
 
   def lookup(id: String): Observable[Real] = Lookup(id)
 
@@ -104,8 +110,10 @@ object Observable {
   def performance(o: Observable[Real])(origin: Time): Observable[Real] = (o / freeze(o)(origin :: Nil)) - 1.0
 
   def expectation(o: Observable[Real])(t: Time): Observable[Real] = Expectation(o, t)
+
+  def expectationT(o: Observable[Real])(t: Observable[Time]): Observable[Real] = ExpectationT(o, t)
   
-  def cdiscount(r: Real)(maturity: Time): Observable[Real] = DiscountFactor(r, maturity, Continuous)
+  def cdiscount(r: Observable[Real])(maturity: Observable[Time]): Observable[Real] = DiscountFactor(r, maturity, Continuous)
 
   def pp[A](input: Observable[A]): String = input match {
     case Now => "t"
@@ -148,6 +156,7 @@ object Observable {
   def evaluate[A](evaluationContext: EvaluationContext)(simulationContext: SimulationContext)(input: Observable[A])(t: Time): A = input match {
     case Now => t
     case Const(a) => a
+    case Symbol(id) => evaluationContext.symbols(id)
     case Lookup(id) => evaluationContext.lookup(id)(t)
     case Lift1R(o, Negate) => -evaluate(evaluationContext)(simulationContext)(o)(t)
     case Lift1R(o, Exp) => scala.math.exp(evaluate(evaluationContext)(simulationContext)(o)(t))
@@ -184,6 +193,10 @@ object Observable {
       evaluate(evaluationContext)(simulationContext)(o)(s)
     case Worst(os, n) => os.map(o => evaluate(evaluationContext)(simulationContext)(o)(t)).sorted.apply(n)
     case Expectation(o, s) => evaluateExpectation(evaluationContext)(simulationContext)(o)(s)(t)
+    case ExpectationT(o, os) =>
+      val s = evaluate(evaluationContext)(simulationContext)(os)(t)
+      //println(s"ExpectationT: s = $s")
+      evaluate(evaluationContext)(simulationContext)(expectation(o)(s))(t)
     case Model(a, b, origin, init, id, f) => ???
     case DiscountFactor(r, maturity, Continuous) => evaluate(evaluationContext)(simulationContext)(exp(-r * (maturity - now)))(t)
     case _ => ???
@@ -241,6 +254,10 @@ object Observable {
   //@tailrec
   def simulate[A](evaluationContext: EvaluationContext)(simulationContext: SimulationContext)(input: Observable[A]): List[List[A]] = input match {
     case Const(a) => (1 to simulationContext.pathCount).toList.map(_ => simulationContext.times.map(_ => a))
+    case Symbol(id) =>
+      val x = evaluationContext.symbols(id)
+      import lofi.Observable.realToObservable
+      simulate(evaluationContext)(simulationContext)(x)
     case Lookup(id) =>
       val origin = evaluationContext.times.max
       val init = evaluationContext.lookup(id)(origin)
@@ -375,6 +392,7 @@ object Observable {
 
   def shouldEnclose[A](input: Observable[A]): Boolean = input match {
     case Now => false
+    case Symbol(_) => false
     case Const(_) => false
     case Lookup(_) => false
     case Lift1R(_, _) => false
@@ -395,6 +413,7 @@ object Observable {
   def toTex[A](input: Observable[A])(time: String): String = input match {
     case Now => time
     case Const(a) => s"$a"
+    case Symbol(id) => id
     case Lookup(id) => s"S_{$time}^{$id}"
     case Lift1R(o @ Now, Negate) => s"-${toTex(o)(time)}"
     case Lift1R(o @ Const(a), Negate) => s"-${toTex(o)(time)}"
@@ -448,8 +467,8 @@ object Observable {
       val oTex = toTex(o)(time)
       val oRepr = if shouldEnclose(o) then s"($oTex)" else oTex
       s"\\neg{$oTex}"
-    case Lift1B(o, Ever) => val underlyingTime = "s"; s"\\exists s \\in \\mathbb{T}; ${toTex(o)(underlyingTime)}"
-    case Lift1B(o, Always) => val underlyingTime = "s"; s"\\forall s \\in \\mathbb{T}; ${toTex(o)(underlyingTime)}"
+    case Lift1B(o, Ever) => val underlyingTime = "u"; s"\\exists $underlyingTime \\in \\mathbb{T}; ${toTex(o)(underlyingTime)}"
+    case Lift1B(o, Always) => val underlyingTime = "u"; s"\\forall $underlyingTime \\in \\mathbb{T}; ${toTex(o)(underlyingTime)}"
     case Lift2B(l, r, And) =>
       val lTex = toTex(l)(time)
       val rTex = toTex(r)(time)
@@ -471,11 +490,13 @@ object Observable {
     case Worst(os, n) =>
       ???
     case Expectation(o, s) =>
-      s"\\mathbb{E}(${toTex(o)("T")} | \\mathcal{F}_{$time})"
+      s"\\mathbb{E}(${toTex(o)(s"T=$s")} | \\mathcal{F}_{$time})"
+    case ExpectationT(o, os) =>
+      s"\\mathbb{E}(${toTex(o)(toTex(os)(time))} | \\mathcal{F}_{$time})"
     case Model(a, b, origin, init, id, Log) =>
       s"\\tilde{S_{$time}^{$id}}"
     case DiscountFactor(r, maturity, Continuous) =>
-      s"e^{-r(T-$time)}"
+      s"e^{-${toTex(r)(time)}(${toTex(maturity)(time)}-$time)}"
     case _ => s"{Unknown}"
   }
 }
